@@ -1,0 +1,8 @@
+__pycache__
+venv
+
+secretsx.py
+
+*.csv
+!sentimientosTweet_3.csv
+!data.csv
