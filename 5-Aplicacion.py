@@ -140,7 +140,11 @@ if view == "Vista Global":
         # Mapa de Calor por Emociones
         with col_map:
 
-            porcen = df.groupby('pais').sum()[['miedo', 'ira', 'expectante', 'confianza', 'sorpresa', 'tristeza', 'repulsion', 'alegria']]
+            columns_to_check = ['miedo', 'ira', 'expectante', 'confianza', 'sorpresa', 'tristeza', 'repulsion', 'alegria']
+            df[columns_to_check] = df[columns_to_check].apply(pd.to_numeric, errors='coerce')
+
+            # Ahora, realiza la agrupación y la suma de forma segura
+            porcen = df.groupby('pais')[columns_to_check].sum()            
             porcen = porcen.assign(suma=porcen.sum(axis=1))
             porcen = porcen.apply(lambda x: (x / porcen['suma']) * 100, axis=0)
             porcen = porcen.reset_index()
@@ -296,6 +300,7 @@ elif view == "Vista Comparativa entre Países":
 
     # Agrupar por mes y país, luego sumar la emoción seleccionada
     temporal_por_pais = temporal_por_pais.groupby([pd.Grouper(freq='ME'), 'pais'])[selected_emocion].sum().reset_index()
+    
 
     # Calcular el porcentaje mensual de la emoción seleccionada respecto al total de emociones
     temporal_por_pais['porcentaje'] = temporal_por_pais.groupby('fecha')[selected_emocion].transform(lambda x: (x / x.sum()) * 100)
